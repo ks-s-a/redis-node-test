@@ -1,6 +1,6 @@
 var debug = require('debug')
 
-var db = require('./db').connect.pub
+var db = require('./db')
 var config = require('./config')
 
 var error = debug('extractor:error')
@@ -10,7 +10,7 @@ var setName = config.SET_NAMES.erroredMessagesSet
  * Log out all error messages and clean error log
  */
 function out() {
-  db.multi()
+  db.connect.pub.multi()
     .smembers(setName)
     .del(setName)
     .exec(function (err, results) {
@@ -21,7 +21,8 @@ function out() {
         console.log(row)
       })
 
-      return process.exit()
+      db.connect.pub.quit()
+      db.connect.sub.quit()
     })
 }
 
